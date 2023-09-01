@@ -1,0 +1,9 @@
+ldi ra 8
+ldi rb 9
+ldi rc 7
+ldi rd 6
+ldi re 4
+ldi rf 3
+ldi rg 2
+ldi rh 1
+hlt

@@ -1,0 +1,4 @@
+ldi ra 7
+ldi rb 5
+sub ra rb
+hlt

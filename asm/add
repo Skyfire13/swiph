@@ -1,0 +1,4 @@
+ldi ra 5
+ldi rb 7
+add ra rb
+hlt
