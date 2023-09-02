@@ -7,7 +7,10 @@ STR - Store value in memory
 LOD - Load value from memory into register
 SWI - Switch the vaue of two registers
 
+- jump to special spot 
+- separate memory for writing to 
 - Some sort of print function
+- Ability for parser to pass over comments
 - A way to save a memory state
 
 Probably not on this version, but a way to index where each instruction
