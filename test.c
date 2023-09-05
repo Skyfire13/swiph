@@ -1,41 +1,26 @@
 #include <stdio.h>
 
-#define MEM_SIZE 25
+#define MEM_SIZE 5
 
-char mem[MEM_SIZE];
+#define itoc(n) n + 48
 
-void load_memory() {
-    FILE* file = fopen("asm/jnz", "r");
-    char buff[20];
+int mem[MEM_SIZE] = {5, 2, 3, 9, 7};
 
-    int i = 0;
-    while(fscanf(file, "%s", buff) != EOF) {
-        mem[i] = i*2;
-        i++;
-    }
+void mem_snapshot() {
+    FILE* file;
 
-    fclose(file);
-}
+    file = fopen("mem_snapshot.txt", "w");
 
-void save_memory() {
-    FILE* file = fopen("asm/mem_jnz", "wb");
-
-    for(int i = 0; i < MEM_SIZE; i++) {
-        fwrite(mem, sizeof(char), MEM_SIZE, file);
+    for(int i; i < MEM_SIZE; i++) {
+        fprintf(file, "%c", mem[i] + 48);
     }
 
     fclose(file);
 }
 
 int main() {
-    
-    load_memory();
 
-    for(int i = 0; i < MEM_SIZE; i++) {
-        printf("%d", mem[i]);
-    }
-
-    save_memory();
+    mem_snapshot();
 
     return 0;
 }

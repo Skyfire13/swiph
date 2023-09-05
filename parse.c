@@ -20,6 +20,8 @@ struct T_map t_map[] = {
     {"cpy", 7},
     {"jmp", 8},
     {"jnz", 9},
+    {"swi", 10},
+    {"sav", 11},
     {"ra",  0},
     {"rb",  1},
     {"rc",  2},

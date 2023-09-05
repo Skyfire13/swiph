@@ -13,6 +13,11 @@ SWI - Switch the vaue of two registers
 - Ability for parser to pass over comments
 - A way to save a memory state
 
+I don't know enough about computers to know what to call this,
+but it would be nice to have a sway to store the current state
+of the "cpu" and load it again later. A command to store registers
+and memory into a file that could be loaded later would be nice.
+
 Probably not on this version, but a way to index where each instruction
 starts instead of just keeping track in memory. Probably another hash
 that just includes the instruction number and it's position in memory
@@ -132,6 +137,19 @@ void mem_load(char* program) {
 	// close file
 	fclose(file);
 }
+/* writes current memory state to a file */
+void mem_snapshot() {
+    FILE* file;
+
+    file = fopen("mem_snapshot.txt", "w");
+
+    for(int i; i < MEM_SIZE; i++) {
+        fprintf(file, "%c", mem[i] + 48);
+    }
+
+    fclose(file);
+}
+
 
 int main(int argc, char* argv[]) {
 
@@ -202,6 +220,16 @@ int main(int argc, char* argv[]) {
                     PC += 3;
                 }
                 continue;
+            // SWI
+            case 10:
+                reg[PC+1] = reg[PC+1] + reg[PC+2]
+                reg[PC+2] = reg[PC+1] - reg[PC+2]
+                reg[PC+1] = reg[PC+1] - reg[PC+2]
+                PC += 3;
+                break;
+            // SAV - saves memory to a text file
+            case 11:
+                break;
             default:
                 printf("Fatal Error! Token not recognized. Exiting program...\n");
         } // End of  switch statement
