@@ -28,7 +28,7 @@ that just includes the instruction number and it's position in memory
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "parse.c"
+#include "parse.h"
 
 #define MEM_SIZE 32
 #define REG_NUM 12
@@ -222,9 +222,9 @@ int main(int argc, char* argv[]) {
                 continue;
             // SWI
             case 10:
-                reg[PC+1] = reg[PC+1] + reg[PC+2]
-                reg[PC+2] = reg[PC+1] - reg[PC+2]
-                reg[PC+1] = reg[PC+1] - reg[PC+2]
+                reg[PC+1] = reg[PC+1] + reg[PC+2];
+                reg[PC+2] = reg[PC+1] - reg[PC+2];
+                reg[PC+1] = reg[PC+1] - reg[PC+2];
                 PC += 3;
                 break;
             // SAV - saves memory to a text file
