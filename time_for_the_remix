@@ -1,6 +1,8 @@
 I would like to change the way this interpreter works. I would like several
 things to change.
 
+0. Move all functions to an appropriate header file
+
 1. The mem and reg arrays will be combined into a single array. The register
 values will be the first values in the new mem array. 
 
@@ -13,3 +15,10 @@ everything around in memory.
 
 4. It will need a way to shift which item in the program's memory it should
 reference based on the PC value, probably with just some simple addition
+    - For example, I will need to change where the program loads to in mem
+
+
+
+
+
+

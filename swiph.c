@@ -2,11 +2,6 @@
 
 swiph.c - Sorta-working-interpreter, please help
 
-Implement:
-STR - Store value in memory
-LOD - Load value from memory into register
-SWI - Switch the vaue of two registers
-
 - jump to special spot 
 - separate memory for writing to 
 - Some sort of print function
@@ -22,6 +17,11 @@ Probably not on this version, but a way to index where each instruction
 starts instead of just keeping track in memory. Probably another hash
 that just includes the instruction number and it's position in memory
 
+Memory Layout:
+0-31 -> Internal State
+32-x -> Program
+x-y  -> RAM..or whatever you call it
+
 */
 
 #include <stdio.h>
@@ -30,73 +30,56 @@ that just includes the instruction number and it's position in memory
 #include <ctype.h>
 #include "parse.h"
 
-#define MEM_SIZE 32
+#define MEM_SIZE 64
 #define REG_NUM 12
+#define PROG_ENTRY 16
 
-#define PC reg[8]
-#define FL reg[9]
-#define AC reg[10]
-#define RO reg[11]
-
+#define PC mem[0]
+#define FL mem[1]
+#define AC mem[2]
+#define RO mem[3]
+#define RA mem[4]
+#define RB mem[5]
+#define RC mem[6]
+#define RD mem[7]
+#define RE mem[8]
+#define RF mem[9]
+#define RG mem[10]
+#define RH mem[11]
 
 /* initialize program memory */
 int mem[MEM_SIZE];
-int reg[REG_NUM];
 
 
 /* prints all registers in a readable format */
-void reg_dump() {
+void reg_dump(void) {
     printf("┏━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┓\n");
     printf("┃ ra ┃ rb ┃ rc ┃ rd ┃ re ┃ rf ┃ rg ┃ rh ┃\n");
     printf("┃ %02d ┃ %02d ┃ %02d ┃ %02d ┃ %02d ┃ %02d ┃ %02d ┃ %02d ┃\n",\
-            reg[0], reg[1], reg[2], reg[3],
-            reg[4], reg[5], reg[6], reg[7]);
+            RA, RB, RC, RD, RE, RF, RG, RH);
     printf("┣━━━━╋━━━━╋━━━━╋━━━━╋━━━━┻━━━━┻━━━━┻━━━━┛\n");
     printf("┃ PC ┃ FL ┃ AC ┃ RO ┃\n");
     printf("┃ %02d ┃ %02d ┃ %02d ┃ %02d ┃\n",\
-            PC, reg[9], reg[10], reg[11]);
+            PC, FL, AC, RO);
     printf("┗━━━━┻━━━━┻━━━━┻━━━━┛\n");
 }
 
-
 /* empties all general purpose registers */
-void reg_empty() {
+void reg_empty(void) {
     for(int i = 0; i < REG_NUM; i++) {
-        reg[i] = 0;
+        mem[i] = 0;
     }
 }
-
 
 /* prints memory to the screen */
-void mem_dump() {
+void mem_dump(void) {
     for(int i = 0; i < MEM_SIZE; i++) {
-        printf("%d\n", mem[i]);
+        printf("%02d %02d\n", i, mem[i]);
     }
 }
-
-
-/* prints memory to the screen, stops when PC hits zeros */
-void mem_dump_filled() {
-    int zeros = 0;
-    for(int i = 0; i < MEM_SIZE; i++) {
-        // Stop printing after 5 zeros in a row
-        if(zeros > 5) {
-            break;
-        }
-        if(mem[i] == 0) {
-            zeros++;
-        } else {
-            zeros = 0;
-        }
-
-        //printf("0x%02x -> 0x%02x\n", i, mem[i]);
-        printf("%02d -> %02d\n", i, mem[i]);
-    }
-}
-
 
 /* sets all memory to 0 */
-void mem_empty(){
+void mem_empty(void){
     for(int i = 0; i < MEM_SIZE; i++) {
         mem[i] = 0;
     }
@@ -124,13 +107,13 @@ void mem_load(char* program) {
         
         // load integers directly into memory
         if(valid_int(word)) {
-            mem[i] = atoi(word);
+            mem[i+PROG_ENTRY] = atoi(word);
             i++;
             continue;
         }
        
         // load tranlated integer token into memory
-        mem[i] = t_match(word);
+        mem[i+PROG_ENTRY] = t_match(word);
         i++;
     }
 
@@ -138,7 +121,7 @@ void mem_load(char* program) {
 	fclose(file);
 }
 /* writes current memory state to a file */
-void mem_snapshot() {
+void mem_snapshot(void) {
     FILE* file;
 
     file = fopen("mem_snapshot.txt", "w");
@@ -158,73 +141,74 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    // initialize registers to 0
-    reg_empty();
-
     // load passed program into memory
     mem_load(argv[1]);
 
-    while(PC < MEM_SIZE) {
+    // initialize program counter to the program entry point
+    PC = PROG_ENTRY;
+
+    while(PC <= MEM_SIZE) {
         switch(mem[PC]) {
             // HLT
             case 0:
                 reg_dump();
+                printf("HLT\n");
                 exit(1);
                 break;
             // LDI
             case 1:
-                reg[mem[PC+1]] = mem[PC+2];
+                // Register Operand 1 = Immediate Operand 2
+                mem[mem[PC+1]] = mem[PC+2];
                 PC += 3;
                 continue;
             // INC
             case 2:
-                reg[mem[PC+1]]++;
+                mem[mem[PC+1]]++;
                 PC += 2;
                 continue;
             // DEC
             case 3:
-                reg[mem[PC+1]]--;
+                mem[mem[PC+1]]--;
                 PC += 2;
                 continue;
             // ADD
             case 4:
-                RO = reg[PC+1] + reg[PC+2];
-                reg[11] = reg[mem[PC+1]] + reg[mem[PC+2]];
+                RO = mem[mem[PC+1]] + mem[mem[PC+2]];
                 PC += 3;
                 continue;
             // SUB
             case 5:
-                reg[11] = reg[mem[PC+1]] - reg[mem[PC+2]];
+                RO = mem[mem[PC+1]] - mem[mem[PC+2]];
                 PC += 3;
                 continue;
             // MOV
             case 6:
-                reg[mem[PC+1]] = reg[mem[PC+2]];
-                reg[mem[PC+2]] = 0;
+                mem[mem[PC+1]] = mem[mem[PC+2]];
+                mem[mem[PC+2]] = 0;
                 PC += 3;
                 continue;
             // CPY
             case 7:
-                reg[mem[PC+1]] = reg[mem[PC+2]];
+                mem[mem[PC+1]] = mem[mem[PC+2]];
                 PC += 3;
                 continue;
             // JMP
             case 8:
-                PC = mem[PC+1];
+                PC = mem[PC+1]+PROG_ENTRY;
                 continue;
             // JNZ
             case 9:
-                if(reg[mem[PC+2]] != 0) {
-                    PC = mem[PC+1];
+                if(mem[mem[PC+2]] != 0) {
+                    PC = mem[PC+1]+PROG_ENTRY;
                 } else {
                     PC += 3;
                 }
                 continue;
             // SWI
             case 10:
-                reg[PC+1] = reg[PC+1] + reg[PC+2];
-                reg[PC+2] = reg[PC+1] - reg[PC+2];
-                reg[PC+1] = reg[PC+1] - reg[PC+2];
+                mem[mem[PC+1]] = mem[mem[PC+1]] + mem[mem[PC+2]];
+                mem[mem[PC+2]] = mem[mem[PC+1]] - mem[mem[PC+2]];
+                mem[mem[PC+1]] = mem[mem[PC+1]] - mem[mem[PC+2]];
                 PC += 3;
                 break;
             // SAV - saves memory to a text file

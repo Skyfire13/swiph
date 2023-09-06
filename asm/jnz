@@ -1,4 +1,5 @@
 ldi ra 10
 dec ra
 jnz 3 ra
+inc rb
 hlt

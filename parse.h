@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <ctype.h>
-
 /* Op_map structure for int token lookup */
 typedef struct T_map{
     char word[10];
@@ -10,30 +7,30 @@ typedef struct T_map{
 
 /* Hash of opcodes and their corresponding integers */
 struct T_map t_map[] = {
-    {"hlt", 0},
-    {"ldi", 1},
-    {"inc", 2},
-    {"dec", 3},
-    {"add", 4},
-    {"sub", 5},
-    {"mov", 6},
-    {"cpy", 7},
-    {"jmp", 8},
-    {"jnz", 9},
+    {"hlt",  0},
+    {"ldi",  1},
+    {"inc",  2},
+    {"dec",  3},
+    {"add",  4},
+    {"sub",  5},
+    {"mov",  6},
+    {"cpy",  7},
+    {"jmp",  8},
+    {"jnz",  9},
     {"swi", 10},
     {"sav", 11},
-    {"ra",  0},
-    {"rb",  1},
-    {"rc",  2},
-    {"rd",  3},
-    {"re",  4},
-    {"rf",  5},
-    {"rg",  6},
-    {"rh",  7},
-    {"pc",  8},
-    {"sp",  9},
-    {"ac", 10},
-    {"ro", 11}
+    {"pc",   0},
+    {"fl",   1},
+    {"ac",   2},
+    {"ro",   3},
+    {"ra",   4},
+    {"rb",   5},
+    {"rc",   6},
+    {"rd",   7},
+    {"re",   8},
+    {"rf",   9},
+    {"rg",  10},
+    {"rh",  11}
 };
 
 /* Takes an opcode string and returns it's corresponding integer */
