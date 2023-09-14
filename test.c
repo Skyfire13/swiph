@@ -12,7 +12,7 @@ void mem_snapshot() {
     file = fopen("mem_snapshot.txt", "w");
 
     for(int i; i < MEM_SIZE; i++) {
-        fprintf(file, "%c", mem[i] + 48);
+        fprintf(file, "%c", itoc(mem[i]));
     }
 
     fclose(file);

@@ -1,4 +1,4 @@
-ldi ac 10
+ldi ac 9
 ldi ra 0
 ldi rb 1
 add ra rb
@@ -6,5 +6,6 @@ mov ra rb
 mov rb ro
 dec ac
 jnz 9 ac
+pri rb
+sav
 hlt
-

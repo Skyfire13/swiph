@@ -2,15 +2,14 @@
 
 swiph.c - Sorta-working-interpreter, please help
 
-- jump to special spot 
-- separate memory for writing to 
-- Some sort of print function
+- jump to special spot(memory address stored in register)
 - Ability for parser to pass over comments
 - A way to save a memory state
+- Add argument flags to do things like dump the system memory after tokenizing
 
 I don't know enough about computers to know what to call this,
 but it would be nice to have a sway to store the current state
-of the "cpu" and load it again later. A command to store registers
+of the "cpu" and load it again later. A command linux keyboard to store registers
 and memory into a file that could be loaded later would be nice.
 
 Probably not on this version, but a way to index where each instruction
@@ -24,32 +23,10 @@ x-y  -> RAM..or whatever you call it
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "parse.h"
-
-#define MEM_SIZE 64
-#define REG_NUM 12
-#define PROG_ENTRY 16
-
-#define PC mem[0]
-#define FL mem[1]
-#define AC mem[2]
-#define RO mem[3]
-#define RA mem[4]
-#define RB mem[5]
-#define RC mem[6]
-#define RD mem[7]
-#define RE mem[8]
-#define RF mem[9]
-#define RG mem[10]
-#define RH mem[11]
+#include "swiph.h"
 
 /* initialize program memory */
 int mem[MEM_SIZE];
-
 
 /* prints all registers in a readable format */
 void reg_dump(void) {
@@ -98,12 +75,20 @@ void mem_load(char* program) {
 	file = fopen(program, "r");
 
 	if (NULL == file) {
-		printf("%s can't be opened\n", program);
-        return;
+		printf("Couldn't open %s. Exiting...\n", program);
+        return 0;
 	}
+
+    // int comment_mode = 0;
 
     int i = 0;
     while (fscanf(file, "%s", word) != EOF) {
+
+        if(comment_mode) {
+            if() {
+
+            }
+        }
         
         // load integers directly into memory
         if(valid_int(word)) {
@@ -120,19 +105,6 @@ void mem_load(char* program) {
 	// close file
 	fclose(file);
 }
-/* writes current memory state to a file */
-void mem_snapshot(void) {
-    FILE* file;
-
-    file = fopen("mem_snapshot.txt", "w");
-
-    for(int i; i < MEM_SIZE; i++) {
-        fprintf(file, "%c", mem[i] + 48);
-    }
-
-    fclose(file);
-}
-
 
 int main(int argc, char* argv[]) {
 
@@ -140,6 +112,7 @@ int main(int argc, char* argv[]) {
         printf("You gotta give me a file chief. Exiting...\n");
         exit(1);
     }
+
 
     // load passed program into memory
     mem_load(argv[1]);
@@ -151,9 +124,7 @@ int main(int argc, char* argv[]) {
         switch(mem[PC]) {
             // HLT
             case 0:
-                reg_dump();
-                printf("HLT\n");
-                exit(1);
+                return 0;
                 break;
             // LDI
             case 1:
@@ -213,9 +184,23 @@ int main(int argc, char* argv[]) {
                 break;
             // SAV - saves memory to a text file
             case 11:
+                FILE* snapshot;
+                snapshot = fopen("snapshot.sav", "w");
+                for(int i = 0; i < MEM_SIZE; i++) {
+                    // fprintf(snapshot, "%02d -> %02d\n", i, mem[i]);
+                    fprintf(snapshot, "%d\n", mem[i]);
+                }
+                fclose(snapshot);
+                PC += 1;
+                break;
+            // PRI
+            case 12:
+                printf("%d\n", mem[mem[PC+1]]);
+                PC += 2;
                 break;
             default:
                 printf("Fatal Error! Token not recognized. Exiting program...\n");
+                return 0;
         } // End of  switch statement
     } // End of instruction loop
 

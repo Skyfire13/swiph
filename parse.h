@@ -19,6 +19,7 @@ struct T_map t_map[] = {
     {"jnz",  9},
     {"swi", 10},
     {"sav", 11},
+    {"pri", 12},
     {"pc",   0},
     {"fl",   1},
     {"ac",   2},
@@ -40,6 +41,8 @@ int t_match(char* str) {
             return(t_map[i].int_token);
         }
     }
+
+    return 0;
 }
 
 int valid_int(char* str) {
@@ -47,7 +50,7 @@ int valid_int(char* str) {
         if(!isdigit(*str)) {
             return 0;
         } else {
-            ++str;
+            str++;
         }
     }
     return 1;
