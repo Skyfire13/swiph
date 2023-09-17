@@ -1,7 +1,8 @@
 /*
 
-swiph.c - Sorta-working-interpreter, please help
+swiph - Sorta-working-interpreter, please help
 
+- aliases for dest_reg and src_reg
 - jump to special spot(memory address stored in register)
 - Ability for parser to pass over comments
 - A way to save a memory state
@@ -63,7 +64,7 @@ void mem_empty(void){
 }
 
 /* loads the program into memory */
-void mem_load(char* program) {
+void mem_init(char* program) {
 
     // clear memory
     mem_empty();
@@ -76,19 +77,13 @@ void mem_load(char* program) {
 
 	if (NULL == file) {
 		printf("Couldn't open %s. Exiting...\n", program);
-        return 0;
+        return;
 	}
 
     // int comment_mode = 0;
 
     int i = 0;
     while (fscanf(file, "%s", word) != EOF) {
-
-        if(comment_mode) {
-            if() {
-
-            }
-        }
         
         // load integers directly into memory
         if(valid_int(word)) {
@@ -113,9 +108,10 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
+    // Instruction to pause the current programm, stash the results, and execute another program
 
     // load passed program into memory
-    mem_load(argv[1]);
+    mem_init(argv[1]);
 
     // initialize program counter to the program entry point
     PC = PROG_ENTRY;
@@ -129,38 +125,38 @@ int main(int argc, char* argv[]) {
             // LDI
             case 1:
                 // Register Operand 1 = Immediate Operand 2
-                mem[mem[PC+1]] = mem[PC+2];
+                DEST_REG = mem[PC+2];
                 PC += 3;
                 continue;
             // INC
             case 2:
-                mem[mem[PC+1]]++;
+                DEST_REG++;
                 PC += 2;
                 continue;
             // DEC
             case 3:
-                mem[mem[PC+1]]--;
+                DEST_REG--;
                 PC += 2;
                 continue;
             // ADD
             case 4:
-                RO = mem[mem[PC+1]] + mem[mem[PC+2]];
+                RO = DEST_REG + SRC_REG;
                 PC += 3;
                 continue;
             // SUB
             case 5:
-                RO = mem[mem[PC+1]] - mem[mem[PC+2]];
+                RO = DEST_REG - SRC_REG;
                 PC += 3;
                 continue;
             // MOV
             case 6:
-                mem[mem[PC+1]] = mem[mem[PC+2]];
-                mem[mem[PC+2]] = 0;
+                DEST_REG = SRC_REG;
+                SRC_REG = 0;
                 PC += 3;
                 continue;
             // CPY
             case 7:
-                mem[mem[PC+1]] = mem[mem[PC+2]];
+                DEST_REG = SRC_REG;
                 PC += 3;
                 continue;
             // JMP
@@ -169,7 +165,7 @@ int main(int argc, char* argv[]) {
                 continue;
             // JNZ
             case 9:
-                if(mem[mem[PC+2]] != 0) {
+                if(SRC_REG != 0) {
                     PC = mem[PC+1]+PROG_ENTRY;
                 } else {
                     PC += 3;
@@ -177,9 +173,9 @@ int main(int argc, char* argv[]) {
                 continue;
             // SWI
             case 10:
-                mem[mem[PC+1]] = mem[mem[PC+1]] + mem[mem[PC+2]];
-                mem[mem[PC+2]] = mem[mem[PC+1]] - mem[mem[PC+2]];
-                mem[mem[PC+1]] = mem[mem[PC+1]] - mem[mem[PC+2]];
+                DEST_REG = DEST_REG + SRC_REG;
+                SRC_REG = DEST_REG - SRC_REG;
+                DEST_REG = DEST_REG - SRC_REG;
                 PC += 3;
                 break;
             // SAV - saves memory to a text file
@@ -195,14 +191,26 @@ int main(int argc, char* argv[]) {
                 break;
             // PRI
             case 12:
-                printf("%d\n", mem[mem[PC+1]]);
+                printf("%d\n", DEST_REG);
                 PC += 2;
+                break;
+            // STR - store regsiter in destination memory
+            case 13:
+                break;
+            // STI
+            case 14:
+                mem[DEST_REG]
+                break;
+            // LDR
+            case 15:
                 break;
             default:
                 printf("Fatal Error! Token not recognized. Exiting program...\n");
                 return 0;
         } // End of  switch statement
     } // End of instruction loop
+
+    /* Parse passed arguments here for dumping memory */
 
     return 0;
 }

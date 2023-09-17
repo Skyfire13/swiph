@@ -20,3 +20,7 @@
 #define RF mem[9]
 #define RG mem[10]
 #define RH mem[11]
+
+#define DEST_REG mem[mem[PC+1]]
+#define SRC_REG mem[mem[PC+2]]
+
