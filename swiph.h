@@ -23,4 +23,5 @@
 
 #define DEST_REG mem[mem[PC+1]]
 #define SRC_REG mem[mem[PC+2]]
-
+#define DEST_MEM mem[PC+1]
+#define SRC_MEM mem[PC+2]

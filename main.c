@@ -2,7 +2,6 @@
 
 swiph - Sorta-working-interpreter, please help
 
-- aliases for dest_reg and src_reg
 - jump to special spot(memory address stored in register)
 - Ability for parser to pass over comments
 - A way to save a memory state
@@ -84,6 +83,8 @@ void mem_init(char* program) {
 
     int i = 0;
     while (fscanf(file, "%s", word) != EOF) {
+
+        // if 
         
         // load integers directly into memory
         if(valid_int(word)) {
@@ -118,52 +119,51 @@ int main(int argc, char* argv[]) {
 
     while(PC <= MEM_SIZE) {
         switch(mem[PC]) {
-            // HLT
+            // hlt - halt
             case 0:
                 return 0;
                 break;
-            // LDI
+            // ldi - load immediate
             case 1:
-                // Register Operand 1 = Immediate Operand 2
                 DEST_REG = mem[PC+2];
                 PC += 3;
                 continue;
-            // INC
+            // inc - increment register
             case 2:
                 DEST_REG++;
                 PC += 2;
                 continue;
-            // DEC
+            // dec - decrement register
             case 3:
                 DEST_REG--;
                 PC += 2;
                 continue;
-            // ADD
+            // add - add registers
             case 4:
                 RO = DEST_REG + SRC_REG;
                 PC += 3;
                 continue;
-            // SUB
+            // sub - subtract registers
             case 5:
                 RO = DEST_REG - SRC_REG;
                 PC += 3;
                 continue;
-            // MOV
+            // mov - move value from one register to another
             case 6:
                 DEST_REG = SRC_REG;
                 SRC_REG = 0;
                 PC += 3;
                 continue;
-            // CPY
+            // cpy - copy value from one register to another
             case 7:
                 DEST_REG = SRC_REG;
                 PC += 3;
                 continue;
-            // JMP
+            // jmp - jump to a location in memory
             case 8:
                 PC = mem[PC+1]+PROG_ENTRY;
                 continue;
-            // JNZ
+            // jnz - jumps to a location in memory if the source register is not 0
             case 9:
                 if(SRC_REG != 0) {
                     PC = mem[PC+1]+PROG_ENTRY;
@@ -171,38 +171,35 @@ int main(int argc, char* argv[]) {
                     PC += 3;
                 }
                 continue;
-            // SWI
+            // swi - switches the value of source and destination register
             case 10:
                 DEST_REG = DEST_REG + SRC_REG;
                 SRC_REG = DEST_REG - SRC_REG;
                 DEST_REG = DEST_REG - SRC_REG;
                 PC += 3;
                 break;
-            // SAV - saves memory to a text file
+            // sav - saves memory to a text file
             case 11:
                 FILE* snapshot;
                 snapshot = fopen("snapshot.sav", "w");
                 for(int i = 0; i < MEM_SIZE; i++) {
-                    // fprintf(snapshot, "%02d -> %02d\n", i, mem[i]);
                     fprintf(snapshot, "%d\n", mem[i]);
                 }
                 fclose(snapshot);
                 PC += 1;
                 break;
-            // PRI
+            // pri - prints the destination register
             case 12:
                 printf("%d\n", DEST_REG);
                 PC += 2;
                 break;
-            // STR - store regsiter in destination memory
+            // str - store regsiter value in destination memory
             case 13:
+                DEST_MEM = SRC_REG;
                 break;
-            // STI
+            // sti - store immediate in destination memory
             case 14:
-                mem[DEST_REG]
-                break;
-            // LDR
-            case 15:
+                DEST_MEM = mem[PC]+2;
                 break;
             default:
                 printf("Fatal Error! Token not recognized. Exiting program...\n");
