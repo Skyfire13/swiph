@@ -1,11 +1,11 @@
-ldi ac 9
-ldi ra 0
-ldi rb 1
-add ra rb
+ldi ac 9    ; load 9 into the accumulator
+ldi ra 0    ; load 0 into register a
+ldi rb 1    ; load 1 into register b
+add ra rb   ; add register a and registers b
 mov ra rb
 mov rb ro
 dec ac
-jnz 9 ac
+jnz 9 ac    ; Jump to mem[9] if ac is not 0
 pri rb
 sav
 hlt

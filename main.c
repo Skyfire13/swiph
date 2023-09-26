@@ -74,27 +74,27 @@ void mem_init(char* program) {
 
 	file = fopen(program, "r");
 
-	if (NULL == file) {
+	if(NULL == file) {
 		printf("Couldn't open %s. Exiting...\n", program);
         return;
 	}
 
     // int comment_mode = 0;
 
-    int i = 0;
-    while (fscanf(file, "%s", word) != EOF) {
+    int i = PROG_ENTRY;
+    while(fscanf(file, "%s", word) != EOF) {
 
         // if 
         
         // load integers directly into memory
         if(valid_int(word)) {
-            mem[i+PROG_ENTRY] = atoi(word);
+            mem[i] = atoi(word);
             i++;
             continue;
         }
        
         // load tranlated integer token into memory
-        mem[i+PROG_ENTRY] = t_match(word);
+        mem[i] = t_match(word);
         i++;
     }
 
@@ -108,8 +108,6 @@ int main(int argc, char* argv[]) {
         printf("You gotta give me a file chief. Exiting...\n");
         exit(1);
     }
-
-    // Instruction to pause the current programm, stash the results, and execute another program
 
     // load passed program into memory
     mem_init(argv[1]);
